@@ -17,51 +17,110 @@ const userLocation = document.getElementById("userLocation"),
 
     Forecast = document.querySelector(".Forecast");
 
+WeatherAPI = `https://api.openweathermap.org/data/2.5/weather?appid=e286d9ec26b378b1be2b514b5faac2dd&q=`;
+
 function findUserLocation() {
-    const apiKey = '28e3387a82af4064989202843240809';
-    fetch(`https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${userLocation.value}&days=8`)
+
+    fetch(WeatherAPI + userLocation.value)
         .then((response) => response.json())
         .then(data => {
+            if (data.cod != '' && data.cod != 200) {
+                alert(data.message);
+                return;
+            }
 
-            console.log(data);
+            weatherIcon.style.background = `url( https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png)`;
 
-            // Forecast.innerHTML="";
+            fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${data.coord.lat}&lon=${data.coord.lon}&appid=e286d9ec26b378b1be2b514b5faac2dd&units=metric`)
+                .then((response) => response.json())
+                .then(data => {
+                    console.log(data);
 
-            city.innerHTML = data.location.name + ", " + data.location.country;
-            weatherIcon.style.background = `url(http://cdn.weatherapi.com/weather/64x64/day/116.png)`
+                    temperature.innerHTML = tempConverter(data.main.temp);
+                    feelsLike.innerHTML = "Feels like " + data.main.feels_like;
+                    description.innerHTML =
+                        `<i class = "fa-brands fa-cloudversify"></i> &nbsp;` + data.weather[0].description;
 
-            temperature.innerHTML = data.current.temp_c;
-            feelsLike.innerHTML = "Feels like " + data.current.feelslike_c;
-            description.innerHTML =
-                `<i class = "fa-brands fa-cloudversify"></i> &nbsp;` + data.current.condition.text;
+                    const options2 = {
+                        weekday: "long",
+                        month: "long",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "numeric",
+                        hour12: true
+                    };
 
-            date.innerHTML = data.location.localtime;
+                    date.innerHTML = getLongFormateDateTime(data.dt, data.timezone, options2);
+                    city.innerHTML = data.name + "," + data.sys.country;
 
+                    HValue.innerHTML = Math.round(data.main.humidity) + "<span>%</span>"
+                    WValue.innerHTML = Math.round(data.wind.speed) + "<span>m/s</span>"
 
+                    const options1 = {
+                        hour: "numeric",
+                        minute: "numeric",
+                        hour12: true
+                    };
 
+                    SRValue.innerHTML = getLongFormateDateTime(data.sys.sunrise, data.timezone, options1);
+                    SSValue.innerHTML = getLongFormateDateTime(data.sys.sunset, data.timezone, options1);
 
-            HValue.innerHTML = Math.round(data.current.humidity) + "<span>%</span>";
-            WValue.innerHTML = Math.round(data.current.wind_kph) + "<span> kph</span>";
+                    CValue.innerHTML = data.clouds.all + "<span>%</span>"
+                    UVValue.innerHTML = ((data.visibility) / 1000) + "<span>km</span>";
+                    PValue.innerHTML = data.main.pressure + "<span>hPa</span>"
 
+                });
 
-            SRValue.innerHTML = data.forecast.forecastday[0].astro.sunrise;
-            SSValue.innerHTML = data.forecast.forecastday[0].astro.sunset;
+            fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${data.coord.lat}&lon=${data.coord.lon}&appid=e286d9ec26b378b1be2b514b5faac2dd&units=metric`)
+                .then((response) => response.json())
+                .then(data => {
+                    console.log(data.list);
+                    Forecast.innerHTML = "";
 
-            CValue.innerHTML = data.current.cloud + "<span>%</span>";
-            UVValue.innerHTML = data.current.uv;
-            PValue.innerHTML = data.current.pressure_mb + "<span>hPa</span>";
+                    data.list.forEach(element => {
+                        let div = document.createElement("div");
 
+                        const options = {
+                            weekday: "long",
+                            month: "long",
+                            day: "numeric"
+                        };
 
-            data.forecast.forecastday.forEach((weather) => {
+                        div.innerHTML += getLongFormateDateTime(element.dt, 0, options);
+                        div.innerHTML += `<p class="img"><img src="https://openweathermap.org/img/wn/${element.weather[0].icon}@2x.png"/></p>`
+                        div.innerHTML += `<p class="forecast-desc">${element.weather[0].description}</p>`
+                        div.innerHTML += `<span><span>${tempConverter(element.main.temp)}</span></span>`
+                        Forecast.append(div);
 
-                let div = document.createElement("div");
-                div.innerHTML += "oo";
-                Forecast.append(div);
+                    });
 
-            });
-
-
+                });
         });
 
+}
+
+function formatUnixTime(dtValue, offSet, options = {}) {
+    const date = new Date((dtValue + offSet) * 1000);
+    return date.toLocaleTimeString([], { timeZone: "UTC", ...options });
+
+}
+
+function getLongFormateDateTime(dtValue, offSet, options) {
+    return formatUnixTime(dtValue, offSet, options)
+}
+
+function tempConverter(temp) {
+    let tempValue = temp;
+    let message = "";
+
+    if (converter.value == "°C") {
+        message = tempValue + "<span>°C</span>";
+
+    } else {
+        let tempF = Math.round((tempValue * 9) / 5 + 32);
+        message = tempF + "<span>°F</span>";
+    }
+
+    return message;
 }
 

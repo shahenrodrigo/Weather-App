@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Weather Forecast App By Shahen Rodrigo</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
@@ -17,11 +17,9 @@
       <div class="input-group">
         <input type="text" id="userLocation" placeholder="Search for places..." />
 
-
-
         <select class="converter" id="converter">
-          <option value="">°C</option>
-          <option value="">°F</option>
+          <option>°C</option>
+          <option>°F</option>
         </select>
 
         <i class="fa fa-search" onclick="findUserLocation()"></i>
@@ -30,7 +28,8 @@
       <h2 class="temperature"></h2>
       <div class="feelslike"></div>
       <div class="description"></div>
-      <hr />
+      <hr>
+      <br><br><br>
       <div class="date"></div>
       <div class="city"></div>
 
@@ -51,8 +50,6 @@
           <h1 id="WValue"></h1>
         </div>
 
-
-
         <div class="sun">
           <span>
             <i class="fa-solid fa-sun"></i>
@@ -70,10 +67,8 @@
           <h1 id="CValue"></h1>
         </div>
 
-
-
         <div class="uv-index">
-          UV Index
+          Visibility
           <i class="fa-solid fa-bacon"></i>
           <h1 id="UVValue"></h1>
         </div>
@@ -85,7 +80,7 @@
         </div>
         <br>
       </div>
-      <h2 class="heading">This Week</h2>
+      <h2 class="heading">Upcoming Forecast</h2>
       <div class="Forecast"></div>
     </div>
   </div>
